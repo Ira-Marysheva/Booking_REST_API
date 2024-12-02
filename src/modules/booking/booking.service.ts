@@ -28,9 +28,6 @@ export class BookingsService {
         if( startTime > endTime){
             throw new BadRequestException(ErrorText.TimeStartOrEndTimeError)
         }
-        if((+endTime.split(':')[0] - +startTime.split(':')[0]) > 1){
-            throw new BadRequestException(ErrorText.TimeBettwenIsBig)
-        }
 
         const booking = await this.bookingsRepository.find({date:formatedDate})
 
