@@ -19,35 +19,40 @@ export class BookingsService {
     }
 
     async createBooking(createBookingDTO:createBookingDTO):Promise<Booking>{ 
-        const value = new Date(createBookingDTO.date)
-        const formatedDate = value.toISOString().split('T')[0]
-        const update = /\d\d[-:]\d\d/g
-        const startTime = createBookingDTO.startTime.match(update)[0]
-        const endTime = createBookingDTO.endTime.match(update)[0]
-
-        if( startTime > endTime){
-            throw new BadRequestException(ErrorText.TimeStartOrEndTimeError)
-        }
-
-        const booking = await this.bookingsRepository.find({date:formatedDate})
-
-        for (let i = 0; i < booking.length; i++) {
-            if(booking[i].startTime.match(update)[0] == startTime && booking[i].endTime.match(update)[0] == endTime){
-                throw new BadRequestException(ErrorText.TimeISTaken)
+        try {
+            // fortated date and time to ISO format(YYYY-MM-DD and HH:mm)
+            const value = new Date(createBookingDTO.date)
+            const formatedDate = value.toISOString().split('T')[0]
+            const update = /\d\d[-:]\d\d/g
+            const startTime = createBookingDTO.startTime.match(update)[0]
+            const endTime = createBookingDTO.endTime.match(update)[0]
+    
+            // check if start time is less than end time    
+            if( startTime > endTime){
+                throw new BadRequestException(ErrorText.TimeStartOrEndTimeError)
             }
+            // check if time is already taken
+            const booking = await this.bookingsRepository.find({date:formatedDate})
+            for (let i = 0; i < booking.length; i++) {
+                if(booking[i].startTime.match(update)[0] == startTime && booking[i].endTime.match(update)[0] == endTime){
+                    throw new BadRequestException(ErrorText.TimeISTaken)
+                }
+            }
+            // check if start time and end time are in the same hour
+            if(startTime.split(':')[0] == endTime.split(':')[0]){
+                throw new BadRequestException(ErrorText.TimeBettwenError)
+            }
+            // create booking
+            return this.bookingsRepository.create({
+                idBooking: uuidv4(),
+                user:createBookingDTO.user,
+                date: formatedDate,
+                startTime:startTime,
+                endTime:endTime,
+            })
+        } catch (error) {
+            throw new BadRequestException(error.message)
         }
-
-        if(startTime.split(':')[0] == endTime.split(':')[0]){
-            throw new BadRequestException(ErrorText.TimeBettwenError)
-        }
-
-        return this.bookingsRepository.create({
-            idBooking: uuidv4(),
-            user:createBookingDTO.user,
-            date: formatedDate,
-            startTime:startTime,
-            endTime:endTime,
-        })
     }
 
     async updateBooking(idBooking: string, updateBooking:UpdatedBookingDto): Promise<Booking> {
@@ -55,10 +60,16 @@ export class BookingsService {
     }
 
     async deleteBooking(idBooking: string):Promise<String> {
-        const booking = await this.getBookingId(idBooking);
-        if(!booking){
-            throw new BadRequestException(ErrorText.BookingNotFound)
+        try {
+            // check if booking exist
+            const booking = await this.getBookingId(idBooking);
+            if(!booking){
+                throw new BadRequestException(ErrorText.BookingNotFound)
+            }
+            //retun message to confirm delete
+            return  "Your shure to delete this booking?"
+        } catch (error) {
+            throw new BadRequestException(error.message)
         }
-        return  "Your shure to delete this booking?"
     }
 }
