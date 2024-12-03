@@ -13,7 +13,6 @@ import { BookingsModule } from '../booking/booking.module';
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         uri:process.env.MONGO_DB
-        // uri: configService.get<string>('MONGODB_URI'), // Get URI from config
       }),
       inject: [ConfigService], // Inject ConfigService
     }),
