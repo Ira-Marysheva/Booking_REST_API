@@ -31,7 +31,7 @@
   ```bash
   git clone https://github.com/Ira-Marysheva/Booking_REST_API.git
   ```
-  <li>
+  </li>
 
   <li>Install the dependencies:
 
