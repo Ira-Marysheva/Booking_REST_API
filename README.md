@@ -10,7 +10,7 @@
 <ul>
   <li>CRUD operations for bookings</li>
   <li>Integration with a database( MongoDB with mongoose)</li>
-  <li></li>Input validation and error handling</li>
+  <li>Input validation and error handling</li>
   <li>Swagger API documentation for easy testing and exploration of the API endpoints</li>
 </ul>
 
@@ -28,9 +28,9 @@
 <ol type="1">
   <li>Clone the repository:
 
-    ```bash
-    git clone https://github.com/Ira-Marysheva/Booking_REST_API.git
-    ```
+  ```bash
+  git clone https://github.com/Ira-Marysheva/Booking_REST_API.git
+  ```
   <li>
 
   <li>Install the dependencies:
