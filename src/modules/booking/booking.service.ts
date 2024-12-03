@@ -4,7 +4,7 @@ import { Booking } from './schemas/booking.schema';
 import { v4 as uuidv4 } from 'uuid';
 import { UpdatedBookingDto } from './dto/updatedBooking.dto';
 import { createBookingDTO } from './dto/createBooking.dto';
-import { ErrorText } from 'src/error';
+import { ErrorText } from '../../error/index';
 
 @Injectable()
 export class BookingsService {
@@ -15,7 +15,7 @@ export class BookingsService {
     }
 
     async getBookings():Promise<Booking[]>{
-        return this.bookingsRepository.find({});
+        return this.bookingsRepository.find({idBooking: {$ne: null}});
     }
 
     async createBooking(createBookingDTO:createBookingDTO):Promise<Booking>{ 
@@ -32,12 +32,11 @@ export class BookingsService {
                 throw new BadRequestException(ErrorText.TimeStartOrEndTimeError)
             }
             // check if time is already taken
-            const booking = await this.bookingsRepository.find({date:formatedDate})
-            for (let i = 0; i < booking.length; i++) {
-                if(booking[i].startTime.match(update)[0] == startTime && booking[i].endTime.match(update)[0] == endTime){
-                    throw new BadRequestException(ErrorText.TimeISTaken)
-                }
+            const booking = await this.bookingsRepository.find({date:formatedDate, startTime, endTime})
+            if(booking){
+               throw new BadRequestException(ErrorText.TimeISTaken)
             }
+            
             // check if start time and end time are in the same hour
             if(startTime.split(':')[0] == endTime.split(':')[0]){
                 throw new BadRequestException(ErrorText.TimeBettwenError)
@@ -56,6 +55,11 @@ export class BookingsService {
     }
 
     async updateBooking(idBooking: string, updateBooking:UpdatedBookingDto): Promise<Booking> {
+         // check if booking exist
+         const booking = await this.getBookingId(idBooking);
+         if(!booking){
+             throw new BadRequestException(ErrorText.BookingNotFound)
+         }
         return this.bookingsRepository.update({idBooking}, updateBooking);
     }
 
