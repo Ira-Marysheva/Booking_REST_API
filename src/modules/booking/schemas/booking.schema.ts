@@ -19,7 +19,7 @@ export class Booking{
 
     @ApiProperty({required:true,description:'Date of the booking'})
     @Prop({ required: true })
-    date: String
+    date: string
 
     @ApiProperty({required:true,description:'Start time of the booking'})
     @Prop({ required: true })
